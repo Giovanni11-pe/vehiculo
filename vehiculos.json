@@ -16,5 +16,131 @@
     "modelo": "Toyota Avanza",
     "tipo": "Camioneta",
     "litros": 4
+  },
+  {
+    "id": 1792701432725,
+    "modelo": "Hyundai Elantra",
+    "tipo": "Auto",
+    "litros": 4
+  },
+  {
+    "id": 1792701530351,
+    "modelo": "Toyota Rush",
+    "tipo": "Camioneta",
+    "litros": 4
+  },
+  {
+    "id": 1792701612979,
+    "modelo": "Tiggo 8",
+    "tipo": "Camioneta",
+    "litros": 5
+  },
+  {
+    "id": 1792701644036,
+    "modelo": "Tiggo 7",
+    "tipo": "Camioneta",
+    "litros": 5
+  },
+  {
+    "id": 1792701715306,
+    "modelo": "Tiggo 7 pro",
+    "tipo": "Camioneta",
+    "litros": 5
+  },
+  {
+    "id": 1792701778052,
+    "modelo": "Chery Arizo 5",
+    "tipo": "Auto",
+    "litros": 5
+  },
+  {
+    "id": 1792701826646,
+    "modelo": "DONGFENF SX5",
+    "tipo": "Camioneta",
+    "litros": 4
+  },
+  {
+    "id": 1792701941817,
+    "modelo": "Chery New tiggo 4",
+    "tipo": "Camioneta",
+    "litros": 4
+  },
+  {
+    "id": 1792702013283,
+    "modelo": "Chery Tiggo 2 pro",
+    "tipo": "Camioneta",
+    "litros": 4
+  },
+  {
+    "id": 1792702048708,
+    "modelo": "CS 35 MAX",
+    "tipo": "Camioneta",
+    "litros": 4
+  },
+  {
+    "id": 1792702134823,
+    "modelo": "Volkswagen Jetta",
+    "tipo": "Auto",
+    "litros": 4
+  },
+  {
+    "id": 1792702304481,
+    "modelo": "Glory 500",
+    "tipo": "Camioneta",
+    "litros": 4
+  },
+  {
+    "id": 1792702377995,
+    "modelo": "Kia Sportage",
+    "tipo": "Camioneta",
+    "litros": 5
+  },
+  {
+    "id": 1792703433561,
+    "modelo": "Kia Seltos",
+    "tipo": "Camioneta",
+    "litros": 5
+  },
+  {
+    "id": 1792703457623,
+    "modelo": "Toyota Rav4",
+    "tipo": "Camioneta",
+    "litros": 5
+  },
+  {
+    "id": 1792703673006,
+    "modelo": "Mitsubishi asx",
+    "tipo": "Camioneta",
+    "litros": 5
+  },
+  {
+    "id": 1792703759663,
+    "modelo": "Hyundai Excel",
+    "tipo": "Auto",
+    "litros": 4
+  },
+  {
+    "id": 1792704010879,
+    "modelo": "Nissan Sentra",
+    "tipo": "Auto",
+    "litros": 4
+  },
+  {
+    "id": 1792704046831,
+    "modelo": "Changan Alse",
+    "tipo": "Auto",
+    "litros": 4
+  },
+  {
+    "id": 1792704058161,
+    "modelo": "Kia Rio",
+    "tipo": "Auto",
+    "litros": 4
+  },
+  {
+    "id": 1792704097536,
+    "modelo": "Toyota Yarias",
+    "tipo": "Auto",
+    "litros": 4
   }
 ]
