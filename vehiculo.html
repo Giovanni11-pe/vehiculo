@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehículos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eceee8;
+    --panel: #f8f9f5;
+    --ink: #17211c;
+    --ink-soft: #55625b;
+    --line: #d3d8cf;
+    --oil: #e3a008;
+    --oil-deep: #b97a00;
+    --oil-soft: #fbf1d3;
+    --green: #1f5c4a;
+    --green-soft: #d6e7df;
+    --clay: #8a4a2b;
+    --clay-soft: #f0dccf;
+    --danger: #b42318;
+    --radius: 14px;
+    --font: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: var(--font);
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.45;
+    min-height: 100vh;
+  }
+  button, input, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 20px 72px; }
+
+  .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
+  header { max-width: 620px; }
+  h1 {
+    margin: 0 0 8px;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+  header p { margin: 0; color: var(--ink-soft); font-size: 1.05rem; }
+
+  /* Botones generales */
+  .btn-solid, .btn-ghost, .btn-pub {
+    border-radius: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: .92rem;
+    white-space: nowrap;
+    transition: background .15s, border-color .15s;
+  }
+  .btn-solid { background: var(--ink); color: #fff; border: 1.5px solid var(--ink); }
+  .btn-solid:hover { background: #2a3a31; }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); font-weight: 500; }
+  .btn-ghost:hover { border-color: var(--ink); }
+  .btn-pub { background: var(--oil); color: #1d1500; border: 1.5px solid var(--oil); }
+  .btn-pub:hover { background: #f2b21f; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  #btnModo[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* Avisos y barra del modo editor */
+  .banner, .editbar {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+  }
+  .banner { background: var(--green-soft); border: 1.5px solid var(--green); }
+  .banner p, .editbar p { margin: 0; }
+  .banner .acc, .editbtns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .editbar { display: none; background: var(--oil-soft); border: 1.5px solid var(--oil); }
+  body.editor .editbar { display: flex; }
+  .editbar.limpio { background: var(--panel); border-color: var(--line); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 330px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  body:not(.editor) .layout { grid-template-columns: 1fr; }
+  body:not(.editor) .panel,
+  body:not(.editor) .acciones,
+  body:not(.editor) #borrarTodo { display: none; }
+
+  /* Panel del formulario */
+  .panel {
+    position: sticky;
+    top: 20px;
+    background: var(--ink);
+    color: #f2f4ee;
+    border-radius: 20px;
+    padding: 26px 24px 24px;
+  }
+  .panel h2 { margin: 0 0 18px; font-size: 1.3rem; font-weight: 600; letter-spacing: -0.01em; }
+  .field { margin-bottom: 16px; }
+  .field > label, .field > .lbl { display: block; font-size: .88rem; color: #b8c2b9; margin-bottom: 6px; }
+  .panel input[type="text"], .panel input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #34423a;
+    background: #1f2b25;
+    color: #fff;
+  }
+  .panel input::placeholder { color: #7d8a80; }
+  .panel input:focus-visible { outline: none; border-color: var(--oil); box-shadow: 0 0 0 3px rgba(227,160,8,.3); }
+
+  .tipo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tipo input { position: absolute; opacity: 0; pointer-events: none; }
+  .tipo label {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 12px 8px 10px;
+    border-radius: 10px;
+    border: 1.5px solid #34423a;
+    background: #1f2b25;
+    cursor: pointer;
+    font-size: .92rem;
+    transition: border-color .15s, background .15s;
+  }
+  .tipo label svg { width: 54px; height: 27px; }
+  .tipo input:checked + label { border-color: var(--oil); background: #2b3326; }
+  .tipo input:focus-visible + label { outline: 3px solid var(--oil); outline-offset: 2px; }
+
+  .stepper { display: flex; align-items: stretch; gap: 8px; }
+  .stepper input { text-align: center; font-size: 1.1rem; font-weight: 600; }
+  .stepper button {
+    flex: 0 0 46px;
+    border-radius: 10px;
+    border: 1.5px solid #34423a;
+    background: #1f2b25;
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+  }
+  .stepper button:hover { border-color: var(--oil); }
+
+  .btn-add {
+    width: 100%;
+    margin-top: 6px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--oil);
+    color: #1d1500;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  .btn-add:hover { background: #f2b21f; }
+  .btn-add:active { transform: translateY(1px); }
+  .btn-cancel {
+    width: 100%;
+    margin-top: 8px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1.5px solid #34423a;
+    background: transparent;
+    color: #f2f4ee;
+    cursor: pointer;
+  }
+  .btn-cancel:hover { border-color: #fff; }
+  .error { min-height: 1.3em; margin: 10px 0 0; color: #ffb4a8; font-size: .88rem; }
+
+  /* Lista */
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    margin-bottom: 14px;
+  }
+  .search { position: relative; flex: 1 1 220px; }
+  .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--ink-soft); }
+  .search input {
+    width: 100%;
+    padding: 12px 14px 12px 40px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--panel);
+  }
+  .search input:focus-visible { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(31,92,74,.2); }
+
+  .seg { display: inline-flex; background: var(--panel); border: 1.5px solid var(--line); border-radius: 12px; padding: 3px; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label { padding: 8px 14px; border-radius: 9px; cursor: pointer; font-size: .92rem; color: var(--ink-soft); white-space: nowrap; }
+  .seg input:checked + label { background: var(--ink); color: #fff; }
+  .seg input:focus-visible + label { outline: 3px solid var(--green); outline-offset: 1px; }
+
+  .sort {
+    padding: 11px 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--panel);
+    cursor: pointer;
+  }
+
+  .summary {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px;
+    margin: 18px 2px 12px;
+    color: var(--ink-soft);
+    font-size: .95rem;
+  }
+  .summary strong { color: var(--ink); font-weight: 600; }
+  .link-btn { background: none; border: none; padding: 0; cursor: pointer; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+  .link-btn:hover { color: var(--danger); }
+
+  ul.items { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .item {
+    display: grid;
+    grid-template-columns: 78px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    background: var(--panel);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px 14px 14px;
+  }
+  body:not(.editor) .item { grid-template-columns: 78px 1fr; }
+  .item.nuevo { animation: entra .6s ease-out; }
+  .item.editando { border-color: var(--oil); background: var(--oil-soft); }
+  @keyframes entra {
+    from { border-color: var(--oil); background: var(--oil-soft); }
+    to { border-color: var(--line); background: var(--panel); }
+  }
+  .ico {
+    width: 78px; height: 58px;
+    display: grid; place-items: center;
+    border-radius: 10px;
+  }
+  .ico svg { width: 60px; height: 30px; }
+  .ico.Auto { background: var(--green-soft); color: var(--green); }
+  .ico.Camioneta { background: var(--clay-soft); color: var(--clay); }
+
+  .info { min-width: 0; }
+  .nombre { margin: 0; font-size: 1.15rem; font-weight: 600; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+  .tipo-txt { font-size: .85rem; color: var(--ink-soft); }
+
+  .gauge { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .dip {
+    position: relative;
+    flex: 1;
+    height: 10px;
+    border-radius: 999px;
+    background: #e1e5dc;
+    overflow: hidden;
+  }
+  .dip i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--oil), var(--oil-deep)); border-radius: 999px; }
+  .dip::after {
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 2px), rgba(255,255,255,.75) calc(10% - 2px) 10%);
+  }
+  .litros { font-weight: 700; font-size: 1.05rem; min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .acciones { display: flex; gap: 4px; }
+  .edit, .del {
+    border: 1.5px solid transparent;
+    background: transparent;
+    color: var(--ink-soft);
+    border-radius: 10px;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: .9rem;
+  }
+  .edit:hover { color: var(--green); border-color: var(--green); background: var(--green-soft); }
+  .del:hover { color: var(--danger); border-color: var(--danger); background: #fdf0ee; }
+
+  .empty, .estado {
+    text-align: center;
+    padding: 48px 20px;
+    border: 2px dashed var(--line);
+    border-radius: var(--radius);
+    color: var(--ink-soft);
+  }
+  .empty strong, .estado strong { display: block; color: var(--ink); font-size: 1.1rem; margin-bottom: 4px; }
+  .estado { margin-bottom: 12px; padding: 22px 20px; }
+  .estado.fallo { border-color: var(--danger); border-style: solid; background: #fdf0ee; }
+
+  /* Aviso emergente */
+  .toast {
+    position: fixed; left: 50%; bottom: 24px;
+    transform: translate(-50%, 20px);
+    opacity: 0; pointer-events: none;
+    display: flex; align-items: center; gap: 14px;
+    max-width: calc(100vw - 32px);
+    background: var(--ink); color: #fff;
+    padding: 12px 14px 12px 18px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    transition: opacity .2s, transform .2s;
+    z-index: 10;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  .toast button { background: var(--oil); color: #1d1500; border: none; border-radius: 8px; padding: 7px 12px; font-weight: 700; cursor: pointer; }
+
+  /* Ventana de conexión con GitHub */
+  dialog {
+    border: none;
+    border-radius: 18px;
+    padding: 26px 24px 22px;
+    width: min(460px, calc(100vw - 32px));
+    background: var(--panel);
+    color: var(--ink);
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  }
+  dialog::backdrop { background: rgba(23,33,28,.55); }
+  dialog h2 { margin: 0 0 6px; font-size: 1.3rem; letter-spacing: -0.01em; }
+  dialog .ayuda { margin: 0 0 18px; color: var(--ink-soft); font-size: .92rem; }
+  dialog .f { margin-bottom: 12px; }
+  dialog label { display: block; font-size: .88rem; color: var(--ink-soft); margin-bottom: 4px; }
+  dialog input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+  }
+  dialog input:focus-visible { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(31,92,74,.2); }
+  dialog .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  dialog .pie { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+  dialog .quitar { margin-right: auto; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .panel { position: static; }
+  }
+  @media (max-width: 520px) {
+    .topbar { flex-direction: column; }
+    .item { grid-template-columns: 1fr auto; }
+    body:not(.editor) .item { grid-template-columns: 1fr; }
+    .ico { display: none; }
+    .seg { width: 100%; }
+    .seg label { flex: 1; text-align: center; padding: 8px 6px; }
+    dialog .fila { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-auto" viewBox="0 0 64 32">
+      <path d="M4 24v-6c0-1.5 1-2.600 2.500-3l7-1.600 6-7.400h22l7.500 7.600 8 1.800c1.200.3 2 1.400 2 2.600V24z" fill="currentColor"/>
+      <circle cx="17" cy="25" r="5" fill="#fff" stroke="currentColor" stroke-width="3"/>
+      <circle cx="47" cy="25" r="5" fill="#fff" stroke="currentColor" stroke-width="3"/>
+    </symbol>
+    <symbol id="i-camioneta" viewBox="0 0 64 32">
+      <path d="M3 24v-9c0-1 .7-1.800 1.700-2l9-1.800 5-6.200h14v7h28.300c.4 0 .7.300.7.700V24z" fill="currentColor"/>
+      <circle cx="16" cy="25" r="5" fill="#fff" stroke="currentColor" stroke-width="3"/>
+      <circle cx="49" cy="25" r="5" fill="#fff" stroke="currentColor" stroke-width="3"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <div class="topbar">
+    <header>
+      <h1>Vehículos</h1>
+      <p>Modelo, tipo y litros de aceite de cada vehículo.</p>
+    </header>
+    <button class="btn-ghost" id="btnModo" type="button" aria-pressed="false">Modo editor</button>
+  </div>
+
+  <section class="banner" id="banner" hidden>
+    <p id="bannerTxt"></p>
+    <div class="acc">
+      <button class="btn-solid" id="legacyImportar" type="button">Importar a la lista</button>
+      <button class="btn-ghost" id="legacyDescartar" type="button">Ahora no</button>
+    </div>
+  </section>
+
+  <section class="editbar" id="editbar">
+    <p id="editEstado"></p>
+    <div class="editbtns">
+      <button class="btn-pub" id="btnPublicar" type="button">Publicar cambios</button>
+      <button class="btn-ghost" id="btnDescartar" type="button">Descartar cambios</button>
+      <button class="btn-ghost" id="btnExportar" type="button">Exportar JSON</button>
+      <button class="btn-ghost" id="btnImportar" type="button">Importar JSON</button>
+      <button class="btn-ghost" id="btnCfg" type="button">Conexión con GitHub</button>
+      <input type="file" id="archivo" accept="application/json,.json" hidden>
+    </div>
+  </section>
+
+  <div class="layout">
+    <aside class="panel">
+      <h2 id="tituloForm">Agregar vehículo</h2>
+      <form id="form" autocomplete="off" novalidate>
+        <div class="field">
+          <label for="modelo">Modelo</label>
+          <input id="modelo" type="text" placeholder="Ej: Toyota Hilux 2020" maxlength="60">
+        </div>
+
+        <div class="field">
+          <span class="lbl" id="lbl-tipo">Tipo</span>
+          <div class="tipo" role="radiogroup" aria-labelledby="lbl-tipo">
+            <input type="radio" name="tipo" id="t-auto" value="Auto" checked>
+            <label for="t-auto"><svg><use href="#i-auto"/></svg>Auto</label>
+            <input type="radio" name="tipo" id="t-cam" value="Camioneta">
+            <label for="t-cam"><svg><use href="#i-camioneta"/></svg>Camioneta</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="litros">Litros de aceite</label>
+          <div class="stepper">
+            <button type="button" id="menos" aria-label="Restar medio litro">−</button>
+            <input id="litros" type="number" step="0.1" min="0.1" max="99" inputmode="decimal" placeholder="4.0">
+            <button type="button" id="mas" aria-label="Sumar medio litro">+</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-add" id="btnGuardar">Agregar vehículo</button>
+        <button type="button" class="btn-cancel" id="btnCancelar" hidden>Cancelar edición</button>
+        <p class="error" id="error" role="alert"></p>
+      </form>
+    </aside>
+
+    <main>
+      <div class="toolbar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg>
+          <input id="buscar" type="search" placeholder="Buscar por modelo o litros" aria-label="Buscar vehículo">
+        </div>
+        <div class="seg" role="radiogroup" aria-label="Filtrar por tipo">
+          <input type="radio" name="f" id="f-todos" value="" checked><label for="f-todos">Todos</label>
+          <input type="radio" name="f" id="f-auto" value="Auto"><label for="f-auto">Autos</label>
+          <input type="radio" name="f" id="f-cam" value="Camioneta"><label for="f-cam">Camionetas</label>
+        </div>
+        <select id="orden" class="sort" aria-label="Ordenar">
+          <option value="reciente">Más recientes</option>
+          <option value="modelo">Modelo A-Z</option>
+          <option value="litrosAsc">Menos aceite primero</option>
+          <option value="litrosDesc">Más aceite primero</option>
+        </select>
+      </div>
+
+      <div class="summary">
+        <span id="resumen"></span>
+        <button class="link-btn" id="borrarTodo" type="button">Eliminar todos</button>
+      </div>
+
+      <div class="estado" id="estado" hidden></div>
+      <ul class="items" id="lista"></ul>
+      <div class="empty" id="vacio" hidden></div>
+    </main>
+  </div>
+</div>
+
+<dialog id="dlgCfg">
+  <form id="formCfg" method="dialog">
+    <h2>Conexión con GitHub</h2>
+    <p class="ayuda">Sirve para publicar los cambios en <strong>vehiculos.json</strong> desde esta página. Crea un token en GitHub (Settings, Developer settings, Fine-grained tokens) solo para este repositorio, con el permiso Contents en lectura y escritura. El token se guarda únicamente en este navegador.</p>
+    <div class="fila">
+      <div class="f"><label for="cfgOwner">Usuario u organización</label><input id="cfgOwner" type="text" autocomplete="off"></div>
+      <div class="f"><label for="cfgRepo">Repositorio</label><input id="cfgRepo" type="text" autocomplete="off"></div>
+    </div>
+    <div class="fila">
+      <div class="f"><label for="cfgBranch">Rama</label><input id="cfgBranch" type="text" autocomplete="off"></div>
+      <div class="f"><label for="cfgPath">Archivo JSON</label><input id="cfgPath" type="text" autocomplete="off"></div>
+    </div>
+    <div class="f"><label for="cfgToken">Token de acceso</label><input id="cfgToken" type="password" autocomplete="off" placeholder="github_pat_..."></div>
+    <div class="pie">
+      <button type="button" class="btn-ghost quitar" id="cfgQuitar">Borrar token</button>
+      <button type="button" class="btn-ghost" id="cfgCerrar">Cancelar</button>
+      <button type="submit" class="btn-solid" value="guardar">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span id="toastTxt"></span>
+  <button type="button" id="deshacer" hidden>Deshacer</button>
+</div>
+
+<script>
+(function () {
+  var ARCHIVO = "vehiculos.json";
+  var K_BORRADOR = "vehiculos_borrador_v2";
+  var K_LEGACY = "vehiculos_v1";
+  var K_LEGACY_OK = "vehiculos_v1_resuelto";
+  var K_CFG = "vehiculos_github_cfg";
+  var K_MODO = "vehiculos_modo_editor";
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- Almacenamiento seguro ----------
+  function leer(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function escribir(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function borrar(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  function leerJSON(k) { try { return JSON.parse(leer(k)); } catch (e) { return null; } }
+
+  // ---------- Estado ----------
+  var publicados = [];
+  var borrador = null;
+  var editor = leer(K_MODO) === "1";
+  var cargando = true;
+  var errorCarga = "";
+  var ultimoNuevo = null;
+  var editandoId = null;
+  var eliminado = null;
+  var toastTimer = null;
+  var publicando = false;
+
+  // ---------- Utilidades ----------
+  function mapaIds(lista) {
+    var m = {};
+    lista.forEach(function (v) { m[v.id] = 1; });
+    return m;
+  }
+  function idLibre(usados) {
+    var id = Date.now();
+    while (usados[id]) id++;
+    return id;
+  }
+  function normalizar(d) {
+    if (!Array.isArray(d)) return [];
+    var usados = {}, out = [];
+    d.forEach(function (v) {
+      if (!v || typeof v.modelo !== "string") return;
+      var litros = parseFloat(v.litros);
+      var modelo = v.modelo.trim().slice(0, 60);
+      if (!modelo || !(litros > 0)) return;
+      var id = Number(v.id);
+      if (!id || usados[id]) id = idLibre(usados);
+      usados[id] = 1;
+      out.push({
+        id: id,
+        modelo: modelo,
+        tipo: v.tipo === "Camioneta" ? "Camioneta" : "Auto",
+        litros: Math.round(litros * 10) / 10
+      });
+    });
+    return out;
+  }
+  function iguales(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function copiar(x) { return JSON.parse(JSON.stringify(x)); }
+  function esc(t) {
+    var d = document.createElement("div");
+    d.textContent = t;
+    return d.innerHTML;
+  }
+  function fmt(n) { return (Math.round(n * 10) / 10).toString().replace(".", ","); }
+  function plural(n, uno, varios) { return n + " " + (n === 1 ? uno : varios); }
+  function trabajo() { return editor ? (borrador || publicados) : publicados; }
+
+  // Aplica un cambio sobre la copia de trabajo y la guarda como borrador
+  function cambiar(fn) {
+    var copia = copiar(borrador || publicados);
+    fn(copia);
+    if (iguales(copia, publicados)) {
+      borrador = null;
+      borrar(K_BORRADOR);
+    } else {
+      borrador = copia;
+      escribir(K_BORRADOR, JSON.stringify(copia));
+    }
+  }
+
+  // ---------- Referencias ----------
+  var form = $("form"), inModelo = $("modelo"), inLitros = $("litros"), errorEl = $("error");
+  var buscar = $("buscar"), orden = $("orden"), lista = $("lista"), vacio = $("vacio"), estado = $("estado");
+  var resumen = $("resumen"), borrarTodo = $("borrarTodo");
+  var toast = $("toast"), toastTxt = $("toastTxt"), btnDeshacer = $("deshacer");
+  var editbar = $("editbar"), editEstado = $("editEstado");
+  var btnPublicar = $("btnPublicar"), btnDescartar = $("btnDescartar");
+
+  function tipoFiltro() { return document.querySelector('input[name="f"]:checked').value; }
+
+  // ---------- Aviso emergente ----------
+  function mostrarToast(txt, conDeshacer, ms) {
+    toastTxt.textContent = txt;
+    btnDeshacer.hidden = !conDeshacer;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); eliminado = null; }, ms || 6000);
+  }
+
+  // ---------- Dibujar ----------
+  function render() {
+    var datos = trabajo();
+    var q = buscar.value.trim().toLowerCase().replace(",", ".");
+    var tipo = tipoFiltro();
+
+    var res = datos.filter(function (v) {
+      var okQ = !q || v.modelo.toLowerCase().indexOf(q) !== -1 || String(v.litros).indexOf(q) !== -1;
+      return okQ && (!tipo || v.tipo === tipo);
+    });
+
+    switch (orden.value) {
+      case "modelo": res.sort(function (a, b) { return a.modelo.localeCompare(b.modelo, "es"); }); break;
+      case "litrosAsc": res.sort(function (a, b) { return a.litros - b.litros; }); break;
+      case "litrosDesc": res.sort(function (a, b) { return b.litros - a.litros; }); break;
+      default: res.sort(function (a, b) { return b.id - a.id; });
+    }
+
+    var max = Math.max(8, datos.reduce(function (m, v) { return Math.max(m, v.litros); }, 0));
+
+    lista.innerHTML = res.map(function (v) {
+      var pct = Math.min(100, (v.litros / max) * 100);
+      var icon = v.tipo === "Auto" ? "i-auto" : "i-camioneta";
+      return '<li class="item' + (v.id === ultimoNuevo ? " nuevo" : "") + (v.id === editandoId ? " editando" : "") + '">' +
+        '<div class="ico ' + v.tipo + '"><svg><use href="#' + icon + '"/></svg></div>' +
+        '<div class="info">' +
+          '<h3 class="nombre">' + esc(v.modelo) + '</h3>' +
+          '<span class="tipo-txt">' + v.tipo + '</span>' +
+          '<div class="gauge"><div class="dip" aria-hidden="true"><i style="width:' + pct + '%"></i></div>' +
+          '<span class="litros">' + fmt(v.litros) + ' L</span></div>' +
+        '</div>' +
+        '<div class="acciones">' +
+          '<button class="edit" data-edit="' + v.id + '" aria-label="Editar ' + esc(v.modelo) + '">Editar</button>' +
+          '<button class="del" data-id="' + v.id + '" aria-label="Eliminar ' + esc(v.modelo) + '">Eliminar</button>' +
+        '</div>' +
+      '</li>';
+    }).join("");
+    ultimoNuevo = null;
+
+    // Estado de carga o error
+    if (cargando) {
+      estado.hidden = false;
+      estado.className = "estado";
+      estado.innerHTML = "<strong>Cargando vehículos</strong>Leyendo " + ARCHIVO + "...";
+    } else if (errorCarga) {
+      estado.hidden = false;
+      estado.className = "estado fallo";
+      estado.innerHTML = "<strong>No se pudo leer " + ARCHIVO + "</strong>" + esc(errorCarga);
+    } else {
+      estado.hidden = true;
+    }
+
+    // Lista vacía
+    if (res.length === 0 && !cargando) {
+      vacio.hidden = false;
+      if (datos.length === 0) {
+        vacio.innerHTML = editor
+          ? "<strong>Aún no hay vehículos</strong>Completa el formulario para agregar el primero."
+          : "<strong>Aún no hay vehículos publicados</strong>Activa el modo editor para agregar el primero.";
+      } else {
+        vacio.innerHTML = '<strong>Ningún vehículo coincide</strong>Prueba con otro modelo o cambia el filtro.<br><br><button class="link-btn" id="limpiarFiltros" type="button">Quitar filtros</button>';
+      }
+    } else {
+      vacio.hidden = true;
+    }
+
+    // Resumen
+    var autos = res.filter(function (v) { return v.tipo === "Auto"; }).length;
+    var cams = res.length - autos;
+    var total = res.reduce(function (s, v) { return s + v.litros; }, 0);
+    if (datos.length === 0) {
+      resumen.textContent = "Sin vehículos registrados";
+    } else {
+      resumen.innerHTML = "<strong>" + plural(res.length, "vehículo", "vehículos") + "</strong>: " +
+        plural(autos, "auto", "autos") + ", " + plural(cams, "camioneta", "camionetas") +
+        ". Aceite total: <strong>" + fmt(total) + " L</strong>";
+    }
+    borrarTodo.hidden = datos.length === 0;
+
+    renderEditbar();
+    renderBanner();
+  }
+
+  function renderEditbar() {
+    var hay = borrador !== null;
+    editbar.classList.toggle("limpio", !hay);
+    editEstado.innerHTML = hay
+      ? "<strong>Hay cambios sin publicar.</strong> Solo se ven en este navegador hasta que los publiques."
+      : "Todo está publicado. Los cambios que hagas se guardan primero como borrador.";
+    btnPublicar.disabled = !hay || publicando;
+    btnPublicar.textContent = publicando ? "Publicando..." : "Publicar cambios";
+    btnDescartar.hidden = !hay;
+  }
+
+  // ---------- Vehículos de la versión anterior ----------
+  function legacyLista() {
+    if (leer(K_LEGACY_OK)) return [];
+    return normalizar(leerJSON(K_LEGACY));
+  }
+  function renderBanner() {
+    var l = legacyLista();
+    var b = $("banner");
+    if (!l.length) { b.hidden = true; return; }
+    b.hidden = false;
+    $("bannerTxt").innerHTML = "Encontré <strong>" + plural(l.length, "vehículo guardado", "vehículos guardados") +
+      "</strong> en este navegador de la versión anterior. ¿Los importo a la lista?";
+  }
+  $("legacyImportar").addEventListener("click", function () {
+    var l = legacyLista();
+    setEditor(true);
+    cambiar(function (copia) {
+      var existe = {};
+      copia.forEach(function (v) { existe[v.modelo.toLowerCase() + "|" + v.tipo + "|" + v.litros] = 1; });
+      l.forEach(function (v) {
+        var k = v.modelo.toLowerCase() + "|" + v.tipo + "|" + v.litros;
+        if (existe[k]) return;
+        existe[k] = 1;
+        var usados = mapaIds(copia);
+        if (usados[v.id]) v.id = idLibre(usados);
+        copia.push(v);
+      });
+    });
+    escribir(K_LEGACY_OK, "1");
+    render();
+    mostrarToast("Vehículos importados. Pulsa Publicar cambios para verlos en otros dispositivos.", false, 8000);
+  });
+  $("legacyDescartar").addEventListener("click", function () {
+    escribir(K_LEGACY_OK, "1");
+    render();
+  });
+
+  // ---------- Modo editor ----------
+  var btnModo = $("btnModo");
+  function setEditor(on) {
+    editor = on;
+    escribir(K_MODO, on ? "1" : "0");
+    document.body.classList.toggle("editor", on);
+    btnModo.setAttribute("aria-pressed", on ? "true" : "false");
+    btnModo.textContent = on ? "Salir del modo editor" : "Modo editor";
+    if (!on) salirEdicion();
+    render();
+  }
+  btnModo.addEventListener("click", function () { setEditor(!editor); });
+
+  // ---------- Formulario: agregar y editar ----------
+  function entrarEdicion(id) {
+    var v = trabajo().find(function (x) { return x.id === id; });
+    if (!v) return;
+    editandoId = id;
+    inModelo.value = v.modelo;
+    inLitros.value = v.litros;
+    $(v.tipo === "Auto" ? "t-auto" : "t-cam").checked = true;
+    $("tituloForm").textContent = "Editar vehículo";
+    $("btnGuardar").textContent = "Guardar cambios";
+    $("btnCancelar").hidden = false;
+    errorEl.textContent = "";
+    render();
+    inModelo.focus();
+    form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function salirEdicion() {
+    editandoId = null;
+    form.reset();
+    $("tituloForm").textContent = "Agregar vehículo";
+    $("btnGuardar").textContent = "Agregar vehículo";
+    $("btnCancelar").hidden = true;
+  }
+
+  $("btnCancelar").addEventListener("click", function () {
+    salirEdicion();
+    render();
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var modelo = inModelo.value.trim();
+    var litros = parseFloat(inLitros.value);
+    var tipo = document.querySelector('input[name="tipo"]:checked').value;
+
+    if (!modelo) { errorEl.textContent = "Escribe el modelo del vehículo."; inModelo.focus(); return; }
+    if (isNaN(litros) || litros <= 0) { errorEl.textContent = "Ingresa los litros de aceite (mayor a 0)."; inLitros.focus(); return; }
+
+    errorEl.textContent = "";
+    litros = Math.round(litros * 10) / 10;
+
+    if (editandoId !== null) {
+      var id = editandoId;
+      cambiar(function (copia) {
+        var v = copia.find(function (x) { return x.id === id; });
+        if (v) { v.modelo = modelo; v.tipo = tipo; v.litros = litros; }
+      });
+      ultimoNuevo = id;
+      salirEdicion();
+    } else {
+      var nuevoId = null;
+      cambiar(function (copia) {
+        nuevoId = idLibre(mapaIds(copia));
+        copia.push({ id: nuevoId, modelo: modelo, tipo: tipo, litros: litros });
+      });
+      ultimoNuevo = nuevoId;
+      inModelo.value = "";
+      inLitros.value = "";
+      inModelo.focus();
+    }
+    render();
+  });
+
+  function ajustar(delta) {
+    var v = parseFloat(inLitros.value);
+    if (isNaN(v)) v = 0;
+    inLitros.value = Math.max(0.5, Math.round((v + delta) * 10) / 10);
+  }
+  $("mas").addEventListener("click", function () { ajustar(0.5); });
+  $("menos").addEventListener("click", function () { ajustar(-0.5); });
+
+  // ---------- Lista: editar y eliminar ----------
+  lista.addEventListener("click", function (e) {
+    var ed = e.target.closest("button[data-edit]");
+    if (ed) { entrarEdicion(Number(ed.getAttribute("data-edit"))); return; }
+
+    var b = e.target.closest("button[data-id]");
+    if (!b) return;
+    var id = Number(b.getAttribute("data-id"));
+    var datos = trabajo();
+    var idx = datos.findIndex(function (v) { return v.id === id; });
+    if (idx === -1) return;
+    eliminado = { item: copiar(datos[idx]), idx: idx };
+    if (editandoId === id) salirEdicion();
+    cambiar(function (copia) { copia.splice(idx, 1); });
+    render();
+    mostrarToast("Vehículo eliminado", true);
+  });
+
+  btnDeshacer.addEventListener("click", function () {
+    if (!eliminado) return;
+    var el = eliminado;
+    eliminado = null;
+    cambiar(function (copia) { copia.splice(Math.min(el.idx, copia.length), 0, el.item); });
+    toast.classList.remove("show");
+    render();
+  });
+
+  borrarTodo.addEventListener("click", function () {
+    if (confirm("¿Eliminar todos los vehículos de la lista? Podrás descartar el cambio antes de publicar.")) {
+      salirEdicion();
+      cambiar(function (copia) { copia.length = 0; });
+      render();
+    }
+  });
+
+  vacio.addEventListener("click", function (e) {
+    if (e.target.id === "limpiarFiltros") {
+      buscar.value = "";
+      $("f-todos").checked = true;
+      render();
+    }
+  });
+
+  // ---------- Filtros ----------
+  buscar.addEventListener("input", render);
+  orden.addEventListener("change", render);
+  document.querySelectorAll('input[name="f"]').forEach(function (r) {
+    r.addEventListener("change", render);
+  });
+
+  // ---------- Barra del editor ----------
+  btnDescartar.addEventListener("click", function () {
+    if (!confirm("¿Descartar los cambios sin publicar y volver a la última versión publicada?")) return;
+    borrador = null;
+    borrar(K_BORRADOR);
+    salirEdicion();
+    render();
+  });
+
+  $("btnExportar").addEventListener("click", function () {
+    var blob = new Blob([JSON.stringify(trabajo(), null, 2) + "\n"], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = ARCHIVO;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  });
+
+  $("btnImportar").addEventListener("click", function () { $("archivo").click(); });
+  $("archivo").addEventListener("change", function (e) {
+    var f = e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      var nuevos;
+      try { nuevos = normalizar(JSON.parse(rd.result)); } catch (err) { mostrarToast("El archivo no es un JSON válido.", false, 6000); return; }
+      if (!nuevos.length) { mostrarToast("El archivo no tiene vehículos válidos.", false, 6000); return; }
+      if (!confirm("¿Reemplazar la lista actual por los " + nuevos.length + " vehículos del archivo?")) return;
+      salirEdicion();
+      cambiar(function (copia) { copia.length = 0; nuevos.forEach(function (v) { copia.push(v); }); });
+      render();
+    };
+    rd.readAsText(f);
+  });
+
+  // ---------- Conexión con GitHub ----------
+  function cfgPorDefecto() {
+    var host = location.hostname, owner = "", repo = "";
+    if (/\.github\.io$/.test(host)) {
+      owner = host.split(".")[0];
+      var seg = location.pathname.split("/").filter(Boolean)[0];
+      repo = (seg && !/\.html?$/i.test(seg)) ? seg : host;
+    }
+    return { owner: owner, repo: repo, branch: "main", path: ARCHIVO, token: "" };
+  }
+  function cfg() {
+    var base = cfgPorDefecto(), g = leerJSON(K_CFG) || {};
+    Object.keys(base).forEach(function (k) { if (g[k]) base[k] = g[k]; });
+    return base;
+  }
+
+  var dlg = $("dlgCfg");
+  function abrirCfg() {
+    var c = cfg();
+    $("cfgOwner").value = c.owner;
+    $("cfgRepo").value = c.repo;
+    $("cfgBranch").value = c.branch;
+    $("cfgPath").value = c.path;
+    $("cfgToken").value = c.token;
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
+  }
+  $("btnCfg").addEventListener("click", abrirCfg);
+  $("cfgCerrar").addEventListener("click", function () { dlg.close(); });
+  $("cfgQuitar").addEventListener("click", function () {
+    var c = cfg();
+    c.token = "";
+    escribir(K_CFG, JSON.stringify(c));
+    $("cfgToken").value = "";
+    mostrarToast("Token borrado de este navegador.", false, 4000);
+  });
+  $("formCfg").addEventListener("submit", function () {
+    escribir(K_CFG, JSON.stringify({
+      owner: $("cfgOwner").value.trim(),
+      repo: $("cfgRepo").value.trim(),
+      branch: $("cfgBranch").value.trim() || "main",
+      path: $("cfgPath").value.trim() || ARCHIVO,
+      token: $("cfgToken").value.trim()
+    }));
+    mostrarToast("Conexión guardada.", false, 3000);
+  });
+
+  function b64(s) {
+    var bytes = new TextEncoder().encode(s), bin = "";
+    bytes.forEach(function (b) { bin += String.fromCharCode(b); });
+    return btoa(bin);
+  }
+
+  function publicar() {
+    var c = cfg();
+    if (!c.owner || !c.repo || !c.token) { abrirCfg(); return; }
+    if (borrador === null || publicando) return;
+
+    publicando = true;
+    renderEditbar();
+
+    var url = "https://api.github.com/repos/" + encodeURIComponent(c.owner) + "/" + encodeURIComponent(c.repo) +
+      "/contents/" + c.path.split("/").map(encodeURIComponent).join("/");
+    var cab = {
+      "Authorization": "Bearer " + c.token,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+    var aPublicar = copiar(borrador);
+
+    function fallo(msg) {
+      publicando = false;
+      renderEditbar();
+      mostrarToast(msg, false, 9000);
+    }
+
+    fetch(url + "?ref=" + encodeURIComponent(c.branch), { headers: cab })
+      .then(function (r) {
+        if (r.status === 200) return r.json().then(function (j) { return j.sha; });
+        if (r.status === 404) return null;
+        throw r.status;
+      })
+      .then(function (sha) {
+        var cuerpo = {
+          message: "Actualizar vehículos",
+          content: b64(JSON.stringify(aPublicar, null, 2) + "\n"),
+          branch: c.branch
+        };
+        if (sha) cuerpo.sha = sha;
+        cab["Content-Type"] = "application/json";
+        return fetch(url, { method: "PUT", headers: cab, body: JSON.stringify(cuerpo) });
+      })
+      .then(function (r) {
+        if (!r.ok) throw r.status;
+        publicados = aPublicar;
+        if (borrador && iguales(borrador, aPublicar)) { borrador = null; borrar(K_BORRADOR); }
+        else if (borrador && iguales(borrador, publicados)) { borrador = null; borrar(K_BORRADOR); }
+        publicando = false;
+        render();
+        mostrarToast("Publicado. Los demás dispositivos lo verán en uno o dos minutos.", false, 7000);
+      })
+      .catch(function (err) {
+        if (err === 401) fallo("GitHub rechazó el token. Revísalo en Conexión con GitHub.");
+        else if (err === 403 || err === 404) fallo("Sin permiso o no se encontró el repositorio, la rama o el archivo. Revisa la conexión y el permiso Contents.");
+        else if (err === 409 || err === 422) fallo("El archivo cambió en GitHub. Vuelve a pulsar Publicar cambios.");
+        else fallo("No se pudo publicar. Revisa tu conexión e inténtalo de nuevo.");
+      });
+  }
+  btnPublicar.addEventListener("click", publicar);
+
+  // ---------- Inicio ----------
+  var guardado = leerJSON(K_BORRADOR);
+  if (Array.isArray(guardado)) borrador = normalizar(guardado);
+
+  document.body.classList.toggle("editor", editor);
+  btnModo.setAttribute("aria-pressed", editor ? "true" : "false");
+  btnModo.textContent = editor ? "Salir del modo editor" : "Modo editor";
+  render();
+
+  fetch(ARCHIVO + "?v=" + Date.now(), { cache: "no-store" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("El servidor respondió " + r.status + ". Comprueba que " + ARCHIVO + " esté en el mismo lugar que esta página.");
+      return r.json();
+    })
+    .then(function (d) {
+      publicados = normalizar(d);
+      if (borrador && iguales(borrador, publicados)) { borrador = null; borrar(K_BORRADOR); }
+      cargando = false;
+      render();
+    })
+    .catch(function (e) {
+      cargando = false;
+      errorCarga = (e && e.message && e.message.indexOf("servidor") !== -1)
+        ? e.message
+        : "Si abriste el archivo directo desde tu computadora, el navegador lo bloquea. Pruébalo ya publicado en GitHub Pages o con un servidor local.";
+      render();
+    });
+})();
+</script>
+</body>
+</html>
