@@ -127,7 +127,7 @@
   },
   {
     "id": 1792704046831,
-    "modelo": "Changan Alse",
+    "modelo": "Changan Alsvin",
     "tipo": "Auto",
     "litros": 4
   },
@@ -140,6 +140,24 @@
   {
     "id": 1792704097536,
     "modelo": "Toyota Yarias",
+    "tipo": "Auto",
+    "litros": 4
+  },
+  {
+    "id": 1792708130834,
+    "modelo": "CHANGAN CS15",
+    "tipo": "Camioneta",
+    "litros": 4
+  },
+  {
+    "id": 1792708159520,
+    "modelo": "Chevrolet aveo",
+    "tipo": "Auto",
+    "litros": 4
+  },
+  {
+    "id": 1792708175551,
+    "modelo": "Nissan Tiida",
     "tipo": "Auto",
     "litros": 4
   }
